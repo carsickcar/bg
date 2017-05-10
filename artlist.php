@@ -12,7 +12,10 @@ require('./lib/init.php');
 // }
 
 //取出所有art
+$sql = "select * from art,cat where art.cat_id = cat.cat_id";
+$arts = mGetAll($sql);
 //print_r($arts);exit();
+
 
 include(ROOT . '/view/admin/artlist.html');
 

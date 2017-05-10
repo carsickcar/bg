@@ -36,7 +36,14 @@ if(empty($_POST)) {
 
 	//判断是否有图片上传 且 error 是否为0
 	if ($_FILES['pic']['name']!=''&&$_FILES['pic']['error']==0) {
-		$filename = createDir();
+		$filename = createDir().'/'.randStr().getExt($_FILES['pic']['name']);
+		if (move_uploaded_file($_FILES['pic']['name'], ROOT.$filename)) {
+			$art['pic'] = $filename;
+			$art['thumb'] = makeThumb($filename);
+		} else {
+			error('图片上传失败');
+		}
+		
 	}
 	// if (!empty($pic)) {
 	// 	$art['pic'] = $_POST['pic'];
@@ -46,50 +53,51 @@ if(empty($_POST)) {
 	$art['pubtime'] = time();
 
 	//收集tag，采用‘,’作为分隔符
-	$art['arttag'] = $_POST['tag'];
+	$art['arttag'] = trim($_POST['tag']);
 
 	// exit();
 
 
 	//插入内容到art表
-	if(!mExec(art,$art)) {
-		
+	if(!mExec('art',$art)) {
 		error('文章发布失败');
 	} else {
 		//判断是否有tag
-		if($art['tag'] == '') {
-	// $a = explode(',', $tag);
-	// foreach ($a as $v) {
-	// 	$art['tag'] = $v;
-	// 	// print_r($art['tag']."\n");
-	// }
-			//将cat 的 num 字段 当前栏目下的文章数 +1
-			$art['num'] += 1;
+
+		if($art['arttag'] == '') {
+			//将art 的 num 字段 当前栏目下的文章数 +1
+			$sql = "update cat set num=num+1 where cat_id=$art[cat_id]";
+			mQuery($sql);
 			succ('文章添加成功');
 		} else {
 			//获取上次 insert 操作产生的主键id
-			$id = getLastId();
+			$tag['art_id'] = getLastId();
 			//插入tag 到tag表
-			
+			$a = explode(',', $art['arttag']);
+			$sql = "insert into tag (art_id,tag) values ";
+			foreach($a as $v) {
+				$sql .= "(" . $tag['art_id'] . ",'" . $v . "') ,";
 			}
 			$sql = rtrim($sql , ",");
+			
+			
 			//echo $sql;
 			if(mQuery($sql)) {
 				//将cat 的 num 字段 当前栏目下的文章数 +1
-				$art['num'] += 1;
+				$sql = "update cat set num = num + 1 where cat_id = $art[cat_id]";
 				succ('文章添加成功');
 			} else {
 				//tag 添加失败 删除原文章
-
-				if(1){
-				//将cat 的 num 字段 当前栏目下的文章数 +1
-				
-				
+				$sql = "delete from art where art_id=$tag[art_id]";
+				if(mQuery($sql)){
+				//将cat 的 num 字段 当前栏目下的文章数 -1
+				$sql = "update cat set num = num - 1 where cat_id = $art[cat_id]";
+				mQuery($sql);				
 					error('文章添加失败');
 				}
 			}
 		}
 	}
-// }
+ }
 
 ?>

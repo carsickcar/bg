@@ -9,33 +9,53 @@ require('./lib/init.php');
 $art_id = $_GET['art_id'];
 
 //判断地址栏传来的art_id是否合法
-
+if (!is_numeric($art_id)) {
+	error('art_id不合法');
+}
 
 //是否有这篇文章
-
+$sql = "select * from art where art_id=$art_id";
+if (!mGetOne($sql)) {
+	error('没有这篇文章');
+}
 
 //查询出所有的栏目
-
+$sql = "select * from cat";
+$cats = mGetAll($sql);
 
 
 
 if(empty($_POST)) {
 	//取出该行
+	$sql = "select *  from art where art_id=$art_id";
+	$art = mGetRow($sql);
+	// print_r($art);
 	include(ROOT . '/view/admin/artedit.html');
 } else {
 	//检测标题是否为空
+	$art['title'] = trim($_POST['title']);
+	if (empty($art['title'])) {
+		error('标题为空');
+	}
 
-
-	//检测栏目是否合法
+	//检测栏目是否合法,id是否为数字
+	
+	$catname =  $_POST['catname'];
+	if (!empty($catname)) {
+		error('栏目名不合法');
+	}
 
 
 	//检测内容是否为空
-
+	$art['content'] = trim($_POST['content']);
+	if (empty($art['content'])) {
+		error('内容为空');
+	}
 
 	//上次修改时间
-
+	$art['lastup'] = time();
 	//执行
-	if() {
+	if(!mExec('art',$art,'update',"art_id=$art_id")) {
 		error('文章修改失败');
 	} else {
 		succ('文章修改成功');
