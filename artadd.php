@@ -22,8 +22,8 @@ if(empty($_POST)) {
 
 	//检测栏目是否合法,id是否为数字
 	
-	$catname =  $_POST['catname'];
-	if (!empty($catname)) {
+	$art['cat_id'] =  $_POST['cat_id'];
+	if (!is_numeric($art['cat_id'])) {
 		error('栏目名不合法');
 	}
 
