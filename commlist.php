@@ -7,9 +7,11 @@
 
 require('./lib/init.php');
 //取出所有的comment
+$sql = "select * from comment";
+$comms = mGetAll($sql);
 
-//print_r($comms);
+// print_r($comm);
 
 //引入html文件
-
+require(ROOT.'/view/admin/commlist.html');
 ?>

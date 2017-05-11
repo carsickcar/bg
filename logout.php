@@ -5,7 +5,8 @@
 论  坛: http://www.zixue.it
 ****/
 
-
+setcookie('name',null,0);
+header('Location:login.php');
 
 
 

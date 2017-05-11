@@ -8,10 +8,12 @@
 require('./lib/init.php');
 
 //查询所有的栏目
-
+$sql = "select * from cat";
+$cats = mGetAll($sql);
 
 
 //判断地址栏是否有cat_id
+
 
 
 //分页代码
@@ -24,5 +26,5 @@ require('./lib/init.php');
 
 
 
-
+require(ROOT.'/view/front/index.html');
 ?>
